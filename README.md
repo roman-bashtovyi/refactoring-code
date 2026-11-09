@@ -17,7 +17,7 @@ It also tells Claude when to leave code alone: "already readable, no change" is 
 Personal, for every project:
 
 ```bash
-git clone https://github.com/RomanBashtovyi/refactoring-code.git ~/.claude/skills/refactoring-code
+git clone https://github.com/roman-bashtovyi/refactoring-code.git ~/.claude/skills/refactoring-code
 ```
 
 For one project, shared with the team through its repository: clone into `.claude/skills/refactoring-code` inside the project.
