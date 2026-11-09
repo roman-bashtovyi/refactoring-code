@@ -53,11 +53,7 @@ Without the skill both models kept dense `array_filter` chains and nested ternar
 
 ## Contributing
 
-Pull requests are welcome. Please keep to how the skill is written:
-
-- Entries are in your own words, never copied from refactoring.guru or another source, and link to their page.
-- A before/after example is plain PHP or TypeScript without a framework, and the after half follows the house rules itself.
-- `SKILL.md` stays under 150 lines and every other file under 400; a new file is listed in `SKILL.md`.
+Issues and pull requests are welcome. Please write entries in your own words and link the page they come from.
 
 ## Credits
 
