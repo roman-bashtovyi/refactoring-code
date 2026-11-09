@@ -21,7 +21,7 @@ They win over refactoring.guru where the two conflict. Formatting follows the pr
 6. Names come from the domain: no abbreviations or placeholders; a variable is called what the UI text or error message calls it.
 7. A comment explains *why*, never *what*.
 8. No wrapper method around an existing one-line call. Extract a method only when its name says what the code does not.
-9. No defensive code for cases that cannot happen; prove a case is reachable first.
+9. No defensive code for cases that cannot happen; prove a case is reachable first: find every caller, check what the UI already prevents (a modal, a disabled control) and what access rules allow.
 10. No magic literals in calls (`0`/`1`, boolean flags): named constants, factory methods or separate methods.
 11. No silent tricks: `+` on arrays that quietly keeps the left keys; comparing an array with its own filtered copy.
 12. Behaviour stays identical. Compare outputs before and after, edge inputs included. A rewrite that changes an edge case is a bug fix, not readability: leave it out or report it.
@@ -29,7 +29,7 @@ They win over refactoring.guru where the two conflict. Formatting follows the pr
 
 ## Review workflow
 
-Copy this checklist into the answer and tick it:
+Follow this checklist every time; copy it into the answer only for a review the user asked for on its own:
 
 ```
 - [ ] 1. Read the code to the end before judging
