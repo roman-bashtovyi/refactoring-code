@@ -17,7 +17,7 @@ Rules for the code inside one function: collection functions, loops, ternaries, 
 **Signs:** Two or more collection functions in one expression — `array_unique(array_filter(array_map(fn…)))`, `array_diff_assoc(array_column(…), array_unique(…))`, a TS chain ending in `.reduce`. The reader decodes it from the inside out, and often a comment explains it. `array_filter` with no callback tests truthiness and `array_unique` removes repeats, both silently, so the line never says what is kept.
 **Do:** Write the loop (house rule 3). A test on an item is an `if`; "seen before" is an array keyed by the value (`isset($seen[$id])`); one loop can fill several results. `array_keys(array_filter($x))` is no exception: moving the filter into its own variable keeps the trick, so it is always a loop with an `if`.
 **TS:** One call per expression is fine. Three calls or any `.reduce` become a loop, or named steps (one call per line, each named) when every step is plain. Two calls are a grep hit: rewrite them unless both callbacks are one property read or one comparison.
-**Edges:** Read what the old line did before replacing it. `array_filter` also drops `'0'`, and so does `if ($value)`, while `!== ''` keeps `'0'` and `NULL`; `array_column` renumbers keys and skips rows without the column; in the second example the result keys become the values instead of positions, harmless for an `IN` condition, so check other callers; store the value as the value too (`$seen[$name] = $name`), as `array_keys($seen)` returns `'123'` as the int `123`.
+**Edges:** Read what the old line did before replacing it. `array_filter` also drops `'0'`, and so does `if ($value)`, while `!== ''` keeps `'0'` and `NULL`; `array_column` renumbers keys and skips rows without the column, so in the third example the loop reports repeats under the keys of `$teachers`, not under positions, and a row without `target_id` is now an error instead of being skipped; in the second example the result keys become the values instead of positions, harmless for an `IN` condition, so check other callers; store the value as the value too (`$seen[$name] = $name`), as `array_keys($seen)` returns `'123'` as the int `123`.
 **Before / after (PHP):**
 ```php
 // Before
@@ -241,7 +241,7 @@ function canTakeExam(Student $student, ?Profile $profile, string $today): bool
 {
     $notExcludedYet = $student->exclusionDate === null || $student->exclusionDate > $today;
     $isOnLeave = $profile !== null && $profile->onLeave;
-    $hasDebts = $student->debts > 0;
+    $hasDebts = $student->debts !== 0;
 
     return $student->enrolled && $notExcludedYet && !$isOnLeave && !$hasDebts;
 }

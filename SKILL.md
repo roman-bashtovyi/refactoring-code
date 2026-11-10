@@ -14,7 +14,7 @@ Code a person reads in one pass beats fewer lines or cleverness. A line that nee
 They win over refactoring.guru where the two conflict. Formatting follows the project's own style files; these rules are about readability.
 
 1. Guard clauses and early return. No `else` after `return`, `continue`, `throw` or `break`.
-2. Nesting depth: at most two blocks in a function (loop + `if` is fine). A loop in a loop with a condition: a `continue` guard, or move the inner part into a named method.
+2. Nesting depth: the statement that does the work sits at most two blocks deep (loop + `if` is fine). A guard that ends in `continue`, `return`, `throw` or `break` does not count, so loop → loop → guard is allowed and loop → `if` → loop → `if` is not: turn each condition into a guard, or move the inner loop into a named method.
 3. One collection function per expression. Two or more, or a callback inside a nested call (`array_unique(array_filter(array_map(fn…)))`): a loop with `if`, or named intermediate variables. In that loop `array_filter` without a callback becomes `if ($value)` (same truthiness; `!== ''` lets `NULL` and `'0'` through) and `array_unique` becomes an array keyed by the value, never kept after the loop. TS: one `.filter`/`.map` is fine; two calls are rewritten unless both callbacks are one property read or one comparison; three calls or any `.reduce`: a loop or named steps. **Exception:** `array_keys(array_filter(...))` is always a loop with `if`, even split over two variables: `array_filter` without a callback is a silent truthiness trick and naming the variable does not remove it.
 4. Compute conditional values into named variables before a `return`, an array or object literal, or JSX.
 5. A ternary only picks between two simple values. Never nest one.
@@ -94,15 +94,18 @@ Smell entries name their techniques and files. All 13 files:
 
 ## Quick search
 
-Run from this skill's directory; the diff checks run on the changed files.
+Run from this skill's directory; the diff checks run on the changed files. The greps are a net, not the check: they miss a condition inside a literal (house rule 4) and a ternary split over lines, so step 1 of the checklist, reading to the end, stays the real pass. A hit is a line to read, not a finding: `implode(', ', array_map(...))` is one collection function and passes.
 
 ```bash
 grep -nE '^## ' techniques/*.md smells/*.md expressions.md react.md        # find an entry by name
-grep -nE 'array_(map|filter|keys|values|intersect|diff|flip|column|merge|unique|fill_keys)\(.*array_' FILE   # dense PHP
+grep -nE '\w+\(.*array_\w+\(' FILE                                        # a call around array_*: count(array_filter(, array_values(array_unique(
+grep -nE '^\s*array_\w+\(' FILE                                            # array_* on its own line: nesting split by the formatter
+grep -nE 'array_reduce\(|\.reduce\(' FILE                                  # reduce is a hit on its own
+grep -nE '\.(filter|map|reduce|flatMap)\(.*\)\.(filter|map|reduce|flatMap)\(' FILE   # TS chain on one line
+grep -nE '^\s*\.(filter|map|reduce|flatMap)\(' FILE                        # TS chain split by prettier
 grep -nE '\] \+ \$' FILE                                                    # silent array union
 grep -Pzo '(return|continue|throw|break)\b[^;]*;\s*\}\s*else' FILE          # else after return
 grep -nE ' \? [^;]* \? ' FILE                                               # nested ternary
-grep -nE '\)\.(filter|map|reduce|flatMap)\(.*\)\.(filter|map|reduce|flatMap)\(' FILE   # TS chain
 ```
 
 ## When NOT to refactor
